@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="pane_game" prefHeight="815.0" prefWidth="1072.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.Pre_GameController">
+   <children>
+      <TextField fx:id="textfield_amountCards" disable="true" layoutX="145.0" layoutY="384.0" prefHeight="67.0" prefWidth="333.0" text="2" />
+      <TextField fx:id="txtfield_cardMatching" disable="true" layoutX="145.0" layoutY="298.0" prefHeight="67.0" prefWidth="333.0" text="2" />
+      <Button fx:id="btn_incrementCardMatching" layoutX="539.0" layoutY="319.0" mnemonicParsing="false" onAction="#incrementCardMatching" text="+" />
+      <Button fx:id="btn_incrementCards" layoutX="539.0" layoutY="405.0" mnemonicParsing="false" onAction="#incrementCards" text="+" />
+      <Button fx:id="btn_decrementCardMatching" layoutX="510.0" layoutY="319.0" mnemonicParsing="false" onAction="#decrementCardMatching" text="-" />
+      <Button fx:id="btn_decrementCards" layoutX="510.0" layoutY="405.0" mnemonicParsing="false" onAction="#decrementCards" text="-" />
+      <Button fx:id="btn_play" layoutX="202.0" layoutY="487.0" mnemonicParsing="false" onAction="#showGame" prefHeight="124.0" prefWidth="207.0" text="Button" />
+   </children>
+</AnchorPane>

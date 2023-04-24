@@ -17,7 +17,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        Card card1 = new Card(1, null);
+        Card card2 = new Card(2, null);
+        Card card3 = new Card(1, null);
+        System.out.println(card1==card3);
+        scene = new Scene(loadFXML("Main"));
         stage.setScene(scene);
         stage.show();
     }
