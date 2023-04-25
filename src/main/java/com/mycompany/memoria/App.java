@@ -11,17 +11,15 @@ import java.io.IOException;
 /**
  * JavaFX App
  */
+
+//TODO revisar loaders de fxml y escenas.
 public class App extends Application {
 
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws IOException {
-        Card card1 = new Card(1, null);
-        Card card2 = new Card(2, null);
-        Card card3 = new Card(1, null);
-        System.out.println(card1==card3);
-        scene = new Scene(loadFXML("Main"));
+        scene = new Scene(loadFXML("Pre_GameStage"),1366, 700);
         stage.setScene(scene);
         stage.show();
     }

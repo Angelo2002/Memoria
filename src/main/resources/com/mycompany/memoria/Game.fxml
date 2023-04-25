@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane prefHeight="670.0" prefWidth="1142.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.GameController">
+<AnchorPane prefHeight="700.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.GameController">
    <children>
-      <Pane fx:id="pane_table" layoutX="196.0" prefHeight="573.0" prefWidth="946.0" />
+      <StackPane fx:id="stackpane_table" layoutX="322.0" prefHeight="557.0" prefWidth="948.0" />
+      <VBox fx:id="vbox_gameinfo" layoutX="42.0" layoutY="14.0" prefHeight="433.0" prefWidth="218.0" />
    </children>
 </AnchorPane>

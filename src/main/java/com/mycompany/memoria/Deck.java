@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.mycompany.memoria.GameController.cardMatching;
-
 public class Deck {
     //deck class for memory game
     private final Card[][] matrixCards;
@@ -13,7 +11,7 @@ public class Deck {
     private final int size;
 
 
-    public Deck(int size){
+    public Deck(int size, int cardMatching){
         this.size = size;
         //int idx=0;
         int cardsPerRow = size/cardMatching;
