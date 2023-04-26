@@ -15,6 +15,8 @@ public class GameController {
     //static int columns;
     static int buttonSize;
     int flipCounter = 0;
+    int turnCounter = 0;
+    ArrayList<Button> buttonsOnTable = new ArrayList<>();
 
     ArrayList<Player> players;
     Deck deck;
@@ -28,6 +30,8 @@ public class GameController {
         gpane_table = new GridPane();
         gpane_table.setGridLinesVisible(true);
         fillTable();
+        deck = new Deck(amountCards, cardMatching);
+        deck.assignRandomCardsToButtons(buttonsOnTable);
     }
 
     public void setPlayers(ArrayList<Player> players) {
@@ -75,10 +79,14 @@ public class GameController {
                 Button btn = new Button("r" + i + "c" + j + "p");
                 btn.setPrefWidth(buttonWidth);
                 btn.setPrefHeight(buttonWidth * 1.5);
+                buttonsOnTable.add(btn);
                 hbox.getChildren().add(btn);
             }
         }
         System.out.println("total2: " + total);
     }
+
+
+
 
 }
