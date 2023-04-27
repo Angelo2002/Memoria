@@ -32,6 +32,14 @@ public class GameController {
         fillTable();
         deck = new Deck(amountCards, cardMatching);
         deck.assignRandomCardsToButtons(buttonsOnTable);
+        setImagesToButtons();
+    }
+
+    private void setImagesToButtons() {
+        for (Button button : buttonsOnTable) {
+            ((Card)button.getUserData()).flip();
+            button.setGraphic(((Card)button.getUserData()).getImage());
+        }
     }
 
     public void setPlayers(ArrayList<Player> players) {
@@ -52,10 +60,6 @@ public class GameController {
         int rows = (int) Math.ceil(Math.sqrt(amountCards / 1.5));
         int columns = (int) Math.ceil((rows * 1.5));
 
-        //StackPane stackPane = new StackPane();
-        //stackPane.setAlignment(Pos.CENTER); // Set the alignment of the GridPane within the StackPane to center
-        //VBox.setVgrow(stackPane, Priority.ALWAYS);
-        //stackPane.getChildren().add(gp);
         VBox.setVgrow(gpane_table, Priority.ALWAYS);
 
         addButtonsToGridPane(gpane_table, rows, columns, amountCards, buttonWidth);
@@ -76,7 +80,7 @@ public class GameController {
             gp.add(hbox, 0, i);
             for (int j = 0; j < columns && total < amount; j++) {
                 total++;
-                Button btn = new Button("r" + i + "c" + j + "p");
+                Button btn = new Button();
                 btn.setPrefWidth(buttonWidth);
                 btn.setPrefHeight(buttonWidth * 1.5);
                 buttonsOnTable.add(btn);
@@ -85,6 +89,7 @@ public class GameController {
         }
         System.out.println("total2: " + total);
     }
+
 
 
 

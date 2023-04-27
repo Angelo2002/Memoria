@@ -20,7 +20,12 @@ public class Deck {
         matrixCards = new Card[cardsPerRow][cardMatching];
         for(int i=0;i<cardsPerRow;i++){
             for(int j=0;j<cardMatching;j++){
-                this.matrixCards[i][j]=new Card(i,"file:src/main/resources/com/mycompany/memoria/images/"+i+".png");
+                this.matrixCards[i][j]=new Card(i);
+                if (matrixCards[i][j].setImage("/images/"+i+".png")){
+                    System.out.println("Image loaded");
+                }else{
+                    matrixCards[i][j].generateImage(i);
+                }
                 //idx++; //TODO revisar si tiene algún uso. Originalmente era para llevar la cuenta de las cartas.
             }
         }
