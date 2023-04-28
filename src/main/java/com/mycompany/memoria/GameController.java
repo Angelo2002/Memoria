@@ -7,6 +7,8 @@ import javafx.scene.layout.*;
 
 import java.util.ArrayList;
 
+import static com.mycompany.memoria.utils.cardRatio;
+
 public class GameController {
 
     static int cardMatching;
@@ -16,7 +18,9 @@ public class GameController {
     static int buttonSize;
     int flipCounter = 0;
     int turnCounter = 0;
+
     ArrayList<Button> buttonsOnTable = new ArrayList<>();
+    int playerCounter = 0;
 
     ArrayList<Player> players;
     Deck deck;
@@ -37,15 +41,13 @@ public class GameController {
 
     private void setImagesToButtons() {
         for (Button button : buttonsOnTable) {
-            ((Card)button.getUserData()).flip();
-            button.setGraphic(((Card)button.getUserData()).getImage());
+            button.setGraphic(((Card)button.getUserData()).getCurrentImage());
         }
     }
 
     public void setPlayers(ArrayList<Player> players) {
         this.players = players;
     }
-
 
 
     @FXML
@@ -55,18 +57,12 @@ public class GameController {
         gpane_table.setAlignment(Pos.CENTER); // Alinea el contenido del GridPane en el centro
         double buttonWidth = 100; // or any other desired value
 
-
-        //1.5 more columns than rows
-        int rows = (int) Math.ceil(Math.sqrt(amountCards / 1.5));
-        int columns = (int) Math.ceil((rows * 1.5));
+        //Las cartas son cardRatio veces mas altas que anchas.
+        int rows = (int) Math.ceil(Math.sqrt(amountCards / cardRatio));
+        int columns = (int) Math.ceil((rows * cardRatio));
 
         VBox.setVgrow(gpane_table, Priority.ALWAYS);
-
         addButtonsToGridPane(gpane_table, rows, columns, amountCards, buttonWidth);
-
-        System.out.println("total: " + amountCards);
-
-        //vbox.getChildren().add(stackPane);
         stackpane_table.getChildren().add(gpane_table);
     }
     //TODO on action
@@ -80,18 +76,38 @@ public class GameController {
             gp.add(hbox, 0, i);
             for (int j = 0; j < columns && total < amount; j++) {
                 total++;
-                Button btn = new Button();
-                btn.setPrefWidth(buttonWidth);
-                btn.setPrefHeight(buttonWidth * 1.5);
-                buttonsOnTable.add(btn);
-                hbox.getChildren().add(btn);
+                addNewButton(buttonWidth, hbox);
             }
         }
-        System.out.println("total2: " + total);
+
     }
 
+    private void addNewButton(double buttonWidth, HBox hbox) {
+        Button btn = new Button();
+        btn.setPrefWidth(buttonWidth);
+        btn.setPrefHeight(buttonWidth * 1.5);
+        btn.setOnAction(this::ActionFlipCard);
+        buttonsOnTable.add(btn);
+        hbox.getChildren().add(btn);
+    }
 
-
+    //onAction
+    @FXML
+    public void ActionFlipCard(javafx.event.ActionEvent actionEvent) {
+        Button btn = (Button) actionEvent.getSource();
+        Card card = (Card) btn.getUserData();
+        card.flip();
+        btn.setGraphic(card.getCurrentImage());
+        flipCounter++;
+        if (flipCounter == cardMatching) {
+            flipCounter = 0;
+            turnCounter++;
+            if (turnCounter == playerCounter) {
+                turnCounter = 0;
+                //TODO check if cards match
+            }
+        }
+    }
 
 
 }

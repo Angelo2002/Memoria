@@ -2,86 +2,53 @@ package com.mycompany.memoria;
 
 import javafx.scene.image.ImageView;
 
-
 import java.io.File;
 
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
-import java.awt.RenderingHints;
-
 public class Card {
-    //card class for memory game
     private final int cardID;
-    private ImageView image;
+
     private boolean isFlipped;
     private boolean isMatched;
+    static String MatchedPath = "\\src\\main\\java\\com\\mycompany\\images\\matched.png";
+    static String HiddenPath = "\\src\\main\\java\\com\\mycompany\\images\\hidden.png";
 
+    private ImageView matchedImage;
+    private ImageView hiddenImage;
+    private ImageView frontImage;
+    private ImageView currentImage;
     public Card(int cardID){
         this.cardID = cardID;
         this.isFlipped = false;
         this.isMatched = false;
+        //String absolutePath = new File("./").getAbsolutePath();
+        File file = new File("./" + HiddenPath);
+        System.out.println(file.getAbsolutePath() + " " + file.exists());
+        setDefaultImages(file);
     }
 
-    public boolean setImage(String image){
-        try{
-            File file = new File(image);
-            if (!file.exists()){
-                System.out.println("Image not found");
-                return false;
-            }
-            this.image = new ImageView(file.toURI().toString());
-
-            return true;
+    //TODO refractor images, I'm going insane
+    private void setDefaultImages(File file) {
+        if (file.exists()){
+            hiddenImage = new ImageView(file.toURI().toString());
+            hiddenImage.setFitWidth(100);
+            hiddenImage.setFitHeight(150);
         }
-        catch(Exception e){
-            return false;
-        }
+        else hiddenImage = null;
     }
 
-    //chatGPT realizó esta parte, quería imagenes infinitas y me costó encontrar una forma por mi mismo.
-    public boolean generateImage(int n) {
-        try {
-            String number = Integer.toString(n);
-            // Create a canvas
-            int width = 100;
-            int height = 150;
-            Canvas canvas = new Canvas(width, height);
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-
-            // Draw the background
-            gc.setFill(Color.WHITE);
-            gc.fillRect(0, 0, width, height);
-
-            // Draw the number
-            gc.setFill(Color.BLACK);
-            gc.setFont(new Font("Arial", 48));
-
-            gc.fillText(number, width / 4, height / 2 + 16);
-
-            // Convert Canvas to Image
-            Image fxImage = canvas.snapshot(null, null);
-
-            // Set the image in the ImageView
-            image = new ImageView();
-            image.setImage(fxImage);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public void setFrontImage(ImageView image){
+        this.frontImage = image;
     }
 
 
     public void match(){
         this.isMatched = true;
+        //this.currentImage = matchedImage;
     }
 
     public void unmatch(){
         this.isMatched = false;
+        //this.currentImage = hiddenImage;
     }
 
     public void reset(){
@@ -90,7 +57,7 @@ public class Card {
     }
 
     public String toString(){
-        return this.cardID + " " + this.image;
+        return this.cardID + " " + this.frontImage;
     }
 
 
@@ -99,22 +66,19 @@ public class Card {
         return this.cardID;
     }
 
-    public ImageView getImage(){
-        if (isMatched){
-            return null; //matched
-        }
-        if (isFlipped){
-            System.out.println("Image returned");
-            return this.image;
-        }
-        else {
-            return null; //hidden
-        }
+    public ImageView getCurrentImage(){
+        return this.currentImage;
 
     }
 
     public void flip(){
         this.isFlipped = !this.isFlipped;
+        if (this.isFlipped){
+            this.currentImage = this.frontImage;
+        }
+        else {
+            this.currentImage = hiddenImage;
+        }
     }
 
     public boolean IsFlipped(){

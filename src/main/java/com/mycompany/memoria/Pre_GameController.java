@@ -130,6 +130,7 @@ public class Pre_GameController {
     }
 
     private void updateCpuNames() {
+
         int cpuNum = 1;
         for (Node node : vbox_addplayers.getChildren()) {
             if (node instanceof HBox) {
