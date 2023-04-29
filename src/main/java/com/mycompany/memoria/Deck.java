@@ -1,22 +1,12 @@
 package com.mycompany.memoria;
-
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Deck {
     //deck class for memory game
-    private final Card[][] matrixCards;
+    //private final Card[][] matrixCards;
+    private final ArrayList<cardSet> cardSets;
     private final ArrayList<Card> cards;
     private final int size;
 
@@ -25,30 +15,45 @@ public class Deck {
         this.size = size;
         //int idx=0;
         int cardsPerRow = size/cardMatching;
-        matrixCards = new Card[cardsPerRow][cardMatching];
+
+
+        cardSets = new ArrayList<>();
+        for(int i=0;i<cardsPerRow;i++){
+            cardSets.add(new cardSet());
+            for(int j=0;j<cardMatching;j++){
+                Card card = new Card(i);
+                utils.setImage(i,card);
+                cardSets.get(i).addCard(card);
+            }
+        }
+
+        /*matrixCards = new Card[cardsPerRow][cardMatching];
         for(int i=0;i<cardsPerRow;i++){
             for(int j=0;j<cardMatching;j++){
                 this.matrixCards[i][j]=new Card(i);
                 utils.setImage(i,this.matrixCards[i][j]);
             }
-        }
+        }*/
         cards = copyToArray(size);
     }
 
 
-
-
-
-
-
-
     private ArrayList<Card> copyToArray(int size) {
         ArrayList<Card> cards = new ArrayList<Card>(size);
-        for(Card[] row:matrixCards) cards.addAll(Arrays.asList(row));
+        for(cardSet cardset:cardSets) cards.addAll(cardset.getCardArray());
         return cards;
     }
 
     public boolean checkMatch(){
+        for(cardSet cardset:cardSets){
+            if(cardset.checkMatch() && !cardset.isMatched()){
+                System.out.println("Match found");
+                cardset.match();
+                return true;
+            }
+        }
+        return false;
+        /*
         for(Card[] row:matrixCards){
             boolean found=true;
             for(Card card:row){
@@ -68,6 +73,7 @@ public class Deck {
             }
         }
         return false;
+         */
     }
 
     public int getSize(){
@@ -80,7 +86,8 @@ public class Deck {
 
     public void eraseDeck(){
         this.cards.clear();
-        for(Card[] row:matrixCards) Arrays.fill(row,null);
+        this.cardSets.clear();
+        //for(Card[] row:matrixCards) Arrays.fill(row,null);
     }
 
     public void resetCardsStatus(){
@@ -111,5 +118,34 @@ public class Deck {
             if(card.IsFlipped()) flippedCards.add(card);
         }
         return flippedCards;
+    }
+
+    class cardSet{
+        ArrayList<Card> cardArray;
+        boolean matched;
+        public cardSet(){
+            cardArray = new ArrayList<>();
+        }
+        public void addCard(Card card){
+            cardArray.add(card);
+        }
+        public boolean checkMatch(){
+            for (Card card:cardArray){
+                if(!card.IsFlipped()) return false;
+            }
+            return true;
+        }
+        public void match(){
+            for (Card card:cardArray){
+                card.match();
+            }
+            this.matched=true;
+        }
+        public boolean isMatched(){
+            return this.matched;
+        }
+        public ArrayList<Card> getCardArray() {
+            return this.cardArray;
+        }
     }
 }

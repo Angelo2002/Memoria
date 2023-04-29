@@ -15,7 +15,10 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="199.0">
                <children>
-                  <Label text="Cantidad de Cartas a Emparejar: " />
+                  <Label text="Conjunto de cartas a reconocer: ">
+                     <tooltip>
+                        <Tooltip text="Cantidad de cartas iguales que deben seleccionarse para sumar puntos" />
+                     </tooltip></Label>
                   <TextField fx:id="txtfield_cardMatching" disable="true" prefHeight="52.0" prefWidth="39.0" text="2" />
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
