@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -36,6 +37,12 @@ public class Pre_GameController {
     private VBox vbox_addplayers;
 
     int cpuCounter=0;
+    @FXML
+    private CheckBox chkb_godMode;
+    @FXML
+    private CheckBox chkb_bonus;
+    @FXML
+    private CheckBox chkb_punishment;
 
     @FXML
     private void initialize() {
@@ -148,6 +155,7 @@ public class Pre_GameController {
     @FXML
     private void showGame(ActionEvent actionEvent) {
         try {
+            fetchRules();
             // Load the Game.fxml file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
             Parent root = loader.load();
@@ -167,6 +175,13 @@ public class Pre_GameController {
             e.printStackTrace();
         }
     }
+
+    private void fetchRules(){
+        Ruleset.godMode = chkb_godMode.isSelected();
+        Ruleset.bonus = chkb_bonus.isSelected();
+        Ruleset.punishmentExists = chkb_punishment.isSelected();
+    }
+
 
     private ArrayList<Player> collectPlayersData() {
         ArrayList<Player> players = new ArrayList<>();

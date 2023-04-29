@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -72,5 +73,13 @@ public class utils {
         for(Button button:buttons){
             updateButtonGraphics(button);
         }
+    }
+
+    public static ArrayList<HBox> getPlayersAsHBoxes(ArrayList<Player> players){
+        ArrayList<HBox> hBoxes = new ArrayList<>();
+        for(Player player:players){
+            hBoxes.add(player.playerToHBox());
+        }
+        return hBoxes;
     }
 }

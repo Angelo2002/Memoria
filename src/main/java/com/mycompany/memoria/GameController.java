@@ -1,9 +1,13 @@
 package com.mycompany.memoria;
 
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 
@@ -20,16 +24,18 @@ public class GameController {
     private int streakCounter = 0;
     int flipCounter = 0;
     int turnCounter = 0;
-
+    private boolean cardDelay = false;
     ArrayList<Button> buttonsOnTable = new ArrayList<>();
+    ArrayList<HBox> playerHBoxes;
     int playerCounter = 0;
-
     ArrayList<Player> players;
     Deck deck;
     @FXML
     private StackPane stackpane_table;
 
     private GridPane gpane_table;
+    @FXML
+    private VBox vbox_gameinfo;
 
     @FXML
     public void initialize(){
@@ -39,6 +45,9 @@ public class GameController {
         deck = new Deck(amountCards, cardMatching);
         deck.assignRandomCardsToButtons(buttonsOnTable);
         setImagesToButtons();
+        if(Ruleset.bonus){
+            Ruleset.bonusValue=1;
+        }
     }
 
     public void setPlayerCounter() {
@@ -53,6 +62,9 @@ public class GameController {
 
     public void setPlayers(ArrayList<Player> players) {
         this.players = players;
+        this.playerHBoxes = utils.getPlayersAsHBoxes(this.players);
+        players.get(0).setCurrentTurn(true);
+        vbox_gameinfo.getChildren().addAll(playerHBoxes);
     }
 
 
@@ -62,11 +74,9 @@ public class GameController {
         gpane_table = new GridPane();
         gpane_table.setAlignment(Pos.CENTER); // Alinea el contenido del GridPane en el centro
         double buttonWidth = 100; // or any other desired value
-
         //Las cartas son cardRatio veces mas altas que anchas.
         int rows = (int) Math.ceil(Math.sqrt(amountCards / cardRatio));
         int columns = (int) Math.ceil((rows * cardRatio));
-
         VBox.setVgrow(gpane_table, Priority.ALWAYS);
         addButtonsToGridPane(gpane_table, rows, columns, amountCards, buttonWidth);
         stackpane_table.getChildren().add(gpane_table);
@@ -90,16 +100,37 @@ public class GameController {
         Button btn = new Button();
         btn.setPrefWidth(buttonWidth);
         btn.setPrefHeight(buttonWidth * 1.5);
-        btn.setOnAction(this::ActionFlipCard);
+        btn.setOnMouseClicked(this::ActionFlipCard);
         buttonsOnTable.add(btn);
         hbox.getChildren().add(btn);
     }
 
     //onAction
     @FXML
-    public void ActionFlipCard(javafx.event.ActionEvent actionEvent) {
-        Button btn = (Button) actionEvent.getSource();
+    public void ActionFlipCard(MouseEvent mouseEvent) {
+
+        if(cardDelay){
+            return;
+        }
+
+
+
+        Button btn = (Button) mouseEvent.getSource();
         Card card = (Card) btn.getUserData();
+
+        if (mouseEvent.getButton() == MouseButton.SECONDARY && mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
+            System.out.println("Right click");
+            card.switchGodSight();
+            if(card.getGodSight()){
+                btn.setStyle("-fx-background-color: #00ff00");
+            }else{
+                btn.setStyle("-fx-background-color: #ffffff");
+            }
+            btn.setGraphic(card.getCurrentImage());
+            return;
+        }
+
+
         card.flip();
         btn.setGraphic(card.getCurrentImage());
         flipCounter++;
@@ -112,22 +143,33 @@ public class GameController {
                     }
                 }
                 int bonus=streakCounter*Ruleset.bonusValue;
-                players.get(turnCounter).addScore(Ruleset.pointsPerMatch + bonus);
+                players.get(turnCounter).addScore(cardMatching*Ruleset.pointsPerMatchMult + bonus);
                 streakCounter++;
-
             }else{
                if(streakCounter == 0 && Ruleset.punishmentExists){
                      players.get(turnCounter).punish(Ruleset.punishmentValue);
                 }
-               deck.unflipUnmatched();
-               streakCounter = 0;
-               turnCounter++;
+                streakCounter = 0;
+                cardDelay = true;
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(event -> resumeActions());
+                pause.play();
+                players.get(turnCounter).setCurrentTurn(false);
+                turnCounter++;
                }
             updateAllButtonGraphics(buttonsOnTable);
             }
             if (turnCounter == playerCounter) {
                 turnCounter = 0;
             }
-
+            players.get(turnCounter).setCurrentTurn(true);
         }
+
+        void resumeActions(){
+            deck.unflipUnmatched();
+            updateAllButtonGraphics(buttonsOnTable);
+            cardDelay = false;
+        }
+
+
 }

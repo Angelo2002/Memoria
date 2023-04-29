@@ -52,13 +52,16 @@ public class Deck {
         for(Card[] row:matrixCards){
             boolean found=true;
             for(Card card:row){
-                if(!card.IsFlipped()){
+                if(!card.IsFlipped() || card.IsMatched()){
                     found=false;
                     break;
                 }
             }
             if(found){
+                System.out.println("Match found");
+
                 for(Card card:row){
+                    System.out.println(card.toString());
                     card.match();
                 }
                 return true;
@@ -100,5 +103,13 @@ public class Deck {
         for(Card card:cards){
             if(!card.IsMatched() && card.IsFlipped()) card.flip();
         }
+    }
+
+    public ArrayList<Card> getFlippedCards(){
+        ArrayList<Card> flippedCards = new ArrayList<>();
+        for(Card card:cards){
+            if(card.IsFlipped()) flippedCards.add(card);
+        }
+        return flippedCards;
     }
 }

@@ -5,8 +5,8 @@ public final class Ruleset {
     static int maxPlayers = 4;
     static int minPlayers = 2;
 
-    static int pointsPerMatch = 2;
-    static int pointsPerMismatch = -1;
+    static int pointsPerMatchMult = 1;
+    static float punishmentValue = (float) 0.5;
 
     static int maxCardMatching = 8;
     static int minCardMatching = 2;
@@ -17,7 +17,6 @@ public final class Ruleset {
     static int minTime = 10;
 
     static boolean punishmentExists = false;
-    static int punishmentValue = 0;
     static int bonusValue = 0;
 
     static boolean bonus = false;

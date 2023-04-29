@@ -39,17 +39,17 @@
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <CheckBox mnemonicParsing="false" text="Castigo">
+                  <CheckBox fx:id="chkb_punishment" mnemonicParsing="false" text="Castigo">
                      <tooltip>
                         <Tooltip text="Resta puntos si se falla la primera pareja del turno" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox mnemonicParsing="false" text="Bonus">
+                  <CheckBox fx:id="chkb_bonus" mnemonicParsing="false" text="Bonus">
                      <tooltip>
                         <Tooltip text="Puntos Aumentados por racha de parejas" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox mnemonicParsing="false" text="Modo Revisión">
+                  <CheckBox fx:id="chkb_godMode" mnemonicParsing="false" text="Modo Revisión">
                      <tooltip>
                         <Tooltip text="Permite ver las cartas con click derecho" />
                      </tooltip>
