@@ -179,9 +179,9 @@ public class GameController {
         return players.get(turnCounter).isBot();
     }
 
-    private void botTurn(){
+    private void botTurn() {
         BotPlayer bot = (BotPlayer) players.get(turnCounter);
-        bot.playTurn(buttonsOnTable);
+        //bot.playTurn(buttonsOnTable);
     }
 
 
