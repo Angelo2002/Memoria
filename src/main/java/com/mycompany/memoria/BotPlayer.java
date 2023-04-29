@@ -109,5 +109,10 @@ public class BotPlayer extends Player{
         int index = (int) (Math.random() * availableCards.size());
         return availableCards.get(index);
     }
+
+    @Override
+    public boolean isBot(){
+        return true;
+    }
 }
 

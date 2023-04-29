@@ -64,4 +64,7 @@ public class Player {
         this.currentTurn.set(currentTurn);
     }
 
+    public boolean isBot(){
+        return false;
+    }
 }

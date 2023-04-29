@@ -113,8 +113,6 @@ public class GameController {
             return;
         }
 
-
-
         Button btn = (Button) mouseEvent.getSource();
         Card card = (Card) btn.getUserData();
 
@@ -129,34 +127,16 @@ public class GameController {
             btn.setGraphic(card.getCurrentImage());
             return;
         }
-
-
         card.flip();
         btn.setGraphic(card.getCurrentImage());
         flipCounter++;
         if (flipCounter == cardMatching) {
             flipCounter = 0;
             if(deck.checkMatch()){
-                for(Button button : buttonsOnTable){
-                    if(((Card)button.getUserData()).IsFlipped()){
-                        button.setDisable(true);
-                    }
-                }
-                int bonus=streakCounter*Ruleset.bonusValue;
-                players.get(turnCounter).addScore(cardMatching*Ruleset.pointsPerMatchMult + bonus);
-                streakCounter++;
+                matchAction();
             }else{
-               if(streakCounter == 0 && Ruleset.punishmentExists){
-                     players.get(turnCounter).punish(Ruleset.punishmentValue);
-                }
-                streakCounter = 0;
-                cardDelay = true;
-                PauseTransition pause = new PauseTransition(Duration.seconds(2));
-                pause.setOnFinished(event -> resumeActions());
-                pause.play();
-                players.get(turnCounter).setCurrentTurn(false);
-                turnCounter++;
-               }
+                failAction();
+            }
             updateAllButtonGraphics(buttonsOnTable);
             }
             if (turnCounter == playerCounter) {
@@ -165,11 +145,44 @@ public class GameController {
             players.get(turnCounter).setCurrentTurn(true);
         }
 
-        void resumeActions(){
+    private void failAction() {
+        if(streakCounter == 0 && Ruleset.punishmentExists){
+              players.get(turnCounter).punish(Ruleset.punishmentValue);
+         }
+        streakCounter = 0;
+        cardDelay = true;
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(event -> resumeActions());
+        pause.play();
+        players.get(turnCounter).setCurrentTurn(false);
+        turnCounter++;
+    }
+
+    private void matchAction() {
+        for(Button button : buttonsOnTable){
+            if(((Card)button.getUserData()).IsFlipped()){
+                button.setDisable(true);
+            }
+        }
+        int bonus=streakCounter*Ruleset.bonusValue;
+        players.get(turnCounter).addScore(cardMatching*Ruleset.pointsPerMatchMult + bonus);
+        streakCounter++;
+    }
+
+    void resumeActions(){
             deck.unflipUnmatched();
             updateAllButtonGraphics(buttonsOnTable);
             cardDelay = false;
         }
+
+    private boolean checkBotTurn(){
+        return players.get(turnCounter).isBot();
+    }
+
+    private void botTurn(){
+        BotPlayer bot = (BotPlayer) players.get(turnCounter);
+        bot.playTurn(buttonsOnTable);
+    }
 
 
 }
