@@ -8,6 +8,7 @@ import javafx.scene.layout.*;
 import java.util.ArrayList;
 
 import static com.mycompany.memoria.utils.cardRatio;
+import static com.mycompany.memoria.utils.updateAllButtonGraphics;
 
 public class GameController {
 
@@ -16,6 +17,7 @@ public class GameController {
     //static int rows;
     //static int columns;
     static int buttonSize;
+    private int streakCounter = 0;
     int flipCounter = 0;
     int turnCounter = 0;
 
@@ -37,6 +39,10 @@ public class GameController {
         deck = new Deck(amountCards, cardMatching);
         deck.assignRandomCardsToButtons(buttonsOnTable);
         setImagesToButtons();
+    }
+
+    public void setPlayerCounter() {
+        playerCounter = players.size();
     }
 
     private void setImagesToButtons() {
@@ -66,8 +72,6 @@ public class GameController {
         stackpane_table.getChildren().add(gpane_table);
     }
     //TODO on action
-    //TODO Deck
-    //etc
     private void addButtonsToGridPane(GridPane gp, int rows, int columns, int amount, double buttonWidth) {
         int total = 0;
         for (int i = 0; i < rows && total < amount; i++) {
@@ -101,13 +105,29 @@ public class GameController {
         flipCounter++;
         if (flipCounter == cardMatching) {
             flipCounter = 0;
-            turnCounter++;
+            if(deck.checkMatch()){
+                for(Button button : buttonsOnTable){
+                    if(((Card)button.getUserData()).IsFlipped()){
+                        button.setDisable(true);
+                    }
+                }
+                int bonus=streakCounter*Ruleset.bonusValue;
+                players.get(turnCounter).addScore(Ruleset.pointsPerMatch + bonus);
+                streakCounter++;
+
+            }else{
+               if(streakCounter == 0 && Ruleset.punishmentExists){
+                     players.get(turnCounter).punish(Ruleset.punishmentValue);
+                }
+               deck.unflipUnmatched();
+               streakCounter = 0;
+               turnCounter++;
+               }
+            updateAllButtonGraphics(buttonsOnTable);
+            }
             if (turnCounter == playerCounter) {
                 turnCounter = 0;
-                //TODO check if cards match
             }
+
         }
-    }
-
-
 }

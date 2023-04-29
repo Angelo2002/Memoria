@@ -9,6 +9,7 @@ public class Card {
 
     private boolean isFlipped;
     private boolean isMatched;
+    //TODO revisar si funciona en NetBeans
     static String MatchedPath = "\\src\\main\\java\\com\\mycompany\\images\\matched.png";
     static String HiddenPath = "\\src\\main\\java\\com\\mycompany\\images\\hidden.png";
 
@@ -21,19 +22,28 @@ public class Card {
         this.isFlipped = false;
         this.isMatched = false;
         //String absolutePath = new File("./").getAbsolutePath();
-        File file = new File("./" + HiddenPath);
-        System.out.println(file.getAbsolutePath() + " " + file.exists());
-        setDefaultImages(file);
+
+        setDefaultImages();
     }
 
     //TODO refractor images, I'm going insane
-    private void setDefaultImages(File file) {
+    private void setDefaultImages() {
+        File file = new File("./" + HiddenPath);
+        System.out.println(file.getAbsolutePath() + " " + file.exists());
         if (file.exists()){
             hiddenImage = new ImageView(file.toURI().toString());
             hiddenImage.setFitWidth(100);
             hiddenImage.setFitHeight(150);
         }
         else hiddenImage = null;
+        file = new File("./" + MatchedPath);
+        System.out.println(file.getAbsolutePath() + " " + file.exists());
+        if (file.exists()){
+            matchedImage = new ImageView(file.toURI().toString());
+            matchedImage.setFitWidth(100);
+            matchedImage.setFitHeight(150);
+        }
+        else matchedImage = null;
     }
 
     public void setFrontImage(ImageView image){
@@ -43,12 +53,12 @@ public class Card {
 
     public void match(){
         this.isMatched = true;
-        //this.currentImage = matchedImage;
+        this.currentImage = matchedImage;
     }
 
     public void unmatch(){
         this.isMatched = false;
-        //this.currentImage = hiddenImage;
+        this.currentImage = hiddenImage;
     }
 
     public void reset(){
@@ -57,7 +67,7 @@ public class Card {
     }
 
     public String toString(){
-        return this.cardID + " " + this.frontImage;
+        return this.cardID + " " + this.frontImage.toString();
     }
 
 

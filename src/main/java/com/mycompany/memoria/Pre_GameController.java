@@ -154,6 +154,7 @@ public class Pre_GameController {
 
             GameController game_controller = loader.getController();
             game_controller.setPlayers(collectPlayersData());
+            game_controller.setPlayerCounter();
             // Create a new scene with the loaded FXML file
             Scene gameScene = new Scene(root, 1366, 700);
 

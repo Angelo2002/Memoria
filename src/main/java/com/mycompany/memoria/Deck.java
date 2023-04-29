@@ -96,4 +96,9 @@ public class Deck {
         }
     }
 
+    public void unflipUnmatched() {
+        for(Card card:cards){
+            if(!card.IsMatched() && card.IsFlipped()) card.flip();
+        }
+    }
 }

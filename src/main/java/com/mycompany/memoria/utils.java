@@ -2,12 +2,14 @@ package com.mycompany.memoria;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class utils {
     static final String path = "/images/";
@@ -59,5 +61,16 @@ public class utils {
         ImageView image = new javafx.scene.image.ImageView();
         image.setImage(fxImage);
         return image;
+    }
+
+    public static void updateButtonGraphics(Button button){
+        Card card = (Card) button.getUserData();
+        button.setGraphic(card.getCurrentImage());
+    }
+
+    public static void updateAllButtonGraphics(ArrayList<Button> buttons){
+        for(Button button:buttons){
+            updateButtonGraphics(button);
+        }
     }
 }
