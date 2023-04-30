@@ -171,6 +171,7 @@ public class Pre_GameController {
             // Set the new scene and show the stage
             currentStage.setScene(gameScene);
             currentStage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

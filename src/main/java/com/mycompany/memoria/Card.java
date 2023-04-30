@@ -67,7 +67,7 @@ public class Card {
     }
 
     public String toString(){
-        return this.cardID + " " + this.frontImage.toString();
+        return "GID" + this.cardID;
     }
 
 

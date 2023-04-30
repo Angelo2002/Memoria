@@ -82,4 +82,22 @@ public class utils {
         }
         return hBoxes;
     }
+
+    static boolean cardArrayIsHomogenous(ArrayList<Card> cards){
+        if (cards.size() == 0) return true;
+        int firstCard = cards.get(0).getCardID();
+        for(Card card:cards){
+            if(card.getCardID() != firstCard) return false;
+        }
+        return true;
+    }
+
+    static boolean cardIDBelongsToCardArray(int ID, ArrayList<Card> cards){
+        if (cards.size()==0) return true;
+        for(Card card1:cards){
+            if(card1.getCardID() != ID) return false;
+        }
+        return true;
+    }
+
 }

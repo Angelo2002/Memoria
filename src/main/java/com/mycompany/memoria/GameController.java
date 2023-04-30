@@ -1,6 +1,7 @@
 package com.mycompany.memoria;
 
 import javafx.animation.PauseTransition;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 
 import static com.mycompany.memoria.utils.cardRatio;
@@ -25,17 +27,23 @@ public class GameController {
     int flipCounter = 0;
     int turnCounter = 0;
     private boolean cardDelay = false;
+    static boolean botTurn = false;
     ArrayList<Button> buttonsOnTable = new ArrayList<>();
     ArrayList<HBox> playerHBoxes;
     int playerCounter = 0;
     ArrayList<Player> players;
     Deck deck;
+    boolean gameEnded = false;
+    boolean gameRunning = false;
+
     @FXML
     private StackPane stackpane_table;
 
     private GridPane gpane_table;
     @FXML
     private VBox vbox_gameinfo;
+    @FXML
+    private Button btn_ready;
 
     @FXML
     public void initialize(){
@@ -109,12 +117,16 @@ public class GameController {
     @FXML
     public void ActionFlipCard(MouseEvent mouseEvent) {
 
-        if(cardDelay){
+        if(cardDelay || botTurn || gameEnded || !gameRunning){
             return;
         }
 
         Button btn = (Button) mouseEvent.getSource();
         Card card = (Card) btn.getUserData();
+
+        if (card.IsFlipped()) {
+            return;
+        }
 
         if (mouseEvent.getButton() == MouseButton.SECONDARY && mouseEvent.getEventType() == MouseEvent.MOUSE_CLICKED) {
             System.out.println("Right click");
@@ -127,23 +139,30 @@ public class GameController {
             btn.setGraphic(card.getCurrentImage());
             return;
         }
+        cardFlipLogistics(card);
+    }
+
+    private void cardFlipLogistics(Card card) {
+        addSeenCardAllBots(card);
         card.flip();
-        btn.setGraphic(card.getCurrentImage());
         flipCounter++;
         if (flipCounter == cardMatching) {
+            botsRandomForget();
             flipCounter = 0;
             if(deck.checkMatch()){
                 matchAction();
             }else{
                 failAction();
             }
-            updateAllButtonGraphics(buttonsOnTable);
             }
-            if (turnCounter == playerCounter) {
-                turnCounter = 0;
-            }
-            players.get(turnCounter).setCurrentTurn(true);
+        if (turnCounter == playerCounter) {
+            turnCounter = 0;
         }
+        players.get(turnCounter).setCurrentTurn(true);
+        if(checkBotTurn()) {
+            System.out.println("Bot turn");;botTurn();}
+        updateAllButtonGraphics(buttonsOnTable);
+    }
 
     private void failAction() {
         if(streakCounter == 0 && Ruleset.punishmentExists){
@@ -179,10 +198,58 @@ public class GameController {
         return players.get(turnCounter).isBot();
     }
 
-    private void botTurn() {
+    private void botTurn() { //TODO revisar si se puede acomodar mejor resetBotTurn
+        botTurn = true;
         BotPlayer bot = (BotPlayer) players.get(turnCounter);
-        //bot.playTurn(buttonsOnTable);
+        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        pause.setOnFinished(event -> {
+            Card card = bot.chooseCardAlgorithm(cardMatching, deck.getCards());
+            int previousStreak = streakCounter;
+            cardFlipLogistics(card);
+            if (previousStreak != streakCounter) {
+                bot.resetBotTurn();
+            }
+            if (!bot.isCurrentTurn()){
+                bot.resetBotTurn();
+                botTurn = false;
+            }
+        });
+        pause.play();
+
+        /*ArrayList<Card> botChoices = bot.chooseCards(cardMatching, deck.getCards());
+        for (int i = 0; i < cardMatching; i++) {
+            Card card = botChoices.get(i);
+            cardFlipLogistics(card);
+            }
+         */
     }
 
+    private void addSeenCardAllBots(Card card){
+        for(Player player : players){
+            if(player.isBot()){
+                ((BotPlayer)player).addSeenCard(card);
+            }
+        }
+    }
 
+    private void botsRandomForget(){
+        for(Player player : players){
+            if(player.isBot()){
+                ((BotPlayer)player).randomCardForget();
+            }
+        }
+    }
+
+    private void startIfBotIsFirst(){
+        if(players.get(0).isBot()){
+            botTurn();
+        }
+    }
+
+    @FXML
+    private void startGame(ActionEvent actionEvent) {
+        gameRunning = true;
+        startIfBotIsFirst();
+        btn_ready.setDisable(true);
+    }
 }

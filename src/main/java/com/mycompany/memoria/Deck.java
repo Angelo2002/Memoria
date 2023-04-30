@@ -120,6 +120,10 @@ public class Deck {
         return flippedCards;
     }
 
+    public ArrayList<Card> getCards() {
+        return cards;
+    }
+
     class cardSet{
         ArrayList<Card> cardArray;
         boolean matched;
