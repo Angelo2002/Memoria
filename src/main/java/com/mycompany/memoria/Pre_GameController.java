@@ -1,12 +1,12 @@
 package com.mycompany.memoria;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 
 import javafx.fxml.FXMLLoader;
@@ -43,12 +43,72 @@ public class Pre_GameController {
     private CheckBox chkb_bonus;
     @FXML
     private CheckBox chkb_punishment;
+    @FXML
+    private TableColumn col_playerName;
+    @FXML
+    private TableColumn col_playerScore;
+    @FXML
+    private TableView tbl_globalscores;
+
+
+    static ArrayList<PlayerScoreLog> scores = new ArrayList<>();
+
+
+    public Pre_GameController() {
+        System.out.println("Pre_GameController created");
+    }
+
+
 
     @FXML
     private void initialize() {
+
         cardMatching = 2;
         amountCards = 4;
         buttonSize = 100;
+
+        col_playerName.setCellValueFactory(new PropertyValueFactory<>("playerName"));
+        col_playerScore.setCellValueFactory(new PropertyValueFactory<>("totalScore"));
+        col_playerName.setCellFactory(column -> new TableCell<PlayerScoreLog, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    System.out.println("Null");
+                } else {
+                    setText(item);
+                    System.out.println("Nombre del jugador: " + item);
+                }
+            }
+        });
+        /*
+        tbl_globalscores.sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                updateScoreTable();
+            }
+            System.out.println("Pre_GameController initialized");
+        });
+
+         */
+
+        col_playerScore.setCellFactory(column -> new TableCell<PlayerScoreLog, Float>() {
+            @Override
+            protected void updateItem(Float item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    System.out.println("Null");
+                } else {
+                    setText(Float.toString(item));
+                    System.out.println("Puntaje: " + item);
+                }
+            }
+        });
+        //run later
+        Platform.runLater(this::updateScoreTable);
     }
 
     @FXML
@@ -117,7 +177,7 @@ public class Pre_GameController {
         TextField textField = new TextField("CPU#" + cpuCounter++);
         textField.setEditable(false);
         ComboBox<String> difficultyComboBox = new ComboBox<>();
-        difficultyComboBox.getItems().addAll("Fácil", "Medio", "Difícil");
+        difficultyComboBox.getItems().addAll("Fácil", "Medio", "Difícil","Tramposo");
         difficultyComboBox.getSelectionModel().select(0);
         Button deleteButton = new Button("Eliminar");
 
@@ -198,7 +258,7 @@ public class Pre_GameController {
                 } else {
                     ComboBox<String> difficultyComboBox = (ComboBox<String>) hBox.getChildren().get(1);
                     String difficulty = difficultyComboBox.getValue();
-                    double accuracy;
+                    double accuracy; boolean cheater=false;
                     switch (difficulty) {
                         case "Fácil":
                             accuracy = 0.3;
@@ -209,14 +269,54 @@ public class Pre_GameController {
                         case "Difícil":
                             accuracy = 0.9;
                             break;
+                        case "Tramposo":
+                            accuracy = 1;
+                            cheater = true;
+                            break;
                         default:
                             accuracy = 0.5;
                     }
-                    players.add(new BotPlayer(playerName, accuracy));
+                    players.add(new BotPlayer(playerName, accuracy,cheater));
                 }
             }
         }
         return players;
     }
+
+    public void updateScoreTable(){
+
+        //col_playerName.setSortType(TableColumn.SortType.ASCENDING);
+        //col_playerScore.setSortType(TableColumn.SortType.ASCENDING);
+        tbl_globalscores.refresh();
+        tbl_globalscores.setItems(FXCollections.observableArrayList(scores));
+        //System.out.println("Col Name"+col_playerName.getCellObservableValue(0).getValue());
+        System.out.println("Scores updated" + tbl_globalscores.getItems().size());
+
+    }
+
+    public static void updateScores(ArrayList<Player> players) {
+        for (Player player : players) {
+            PlayerScoreLog existingScore = findScoreByPlayerName(player.getName());
+            if (existingScore != null) {
+                System.out.println("Existing score found for " + player.getName() + " adding " + player.getScore() + " points");
+                existingScore.addScore(player.getScore());
+            } else {
+                System.out.println("No existing score found for " + player.getName() + " adding " + player.getScore() + " points");
+                scores.add(new PlayerScoreLog(player.getName(), player.getScore()));
+            }
+        }
+        //Platform.runLater(this::updateScoreTable);
+    }
+
+    private static PlayerScoreLog findScoreByPlayerName(String playerName) {
+        for (PlayerScoreLog score : scores) {
+            System.out.println("Comparing " + score.getPlayerName() + " with " + playerName);
+            if (score.getPlayerName().equals(playerName)) {
+                return score;
+            }
+        }
+        return null;
+    }
+
 }
 

@@ -6,14 +6,22 @@ public class BotPlayer extends Player{
     private ArrayList<Card> cardsChosen;
     private ArrayList<Card> seenCards;
     private double accuracy;
-
-    public BotPlayer(String name, double accuracy) {
+    private boolean cheater;
+    public BotPlayer(String name, double accuracy, boolean cheater) {
         super(name);
         this.accuracy = accuracy;
+        this.cheater = cheater;
         cardsChosen = new ArrayList<>();
         seenCards = new ArrayList<>();
     }
 
+    public boolean isCheating() {
+        return cheater;
+    }
+
+    public void setSeenCards(ArrayList<Card> seenCards) {
+        this.seenCards = seenCards;
+    }
 
     public void resetSeenCards(){
         seenCards = new ArrayList<Card>();

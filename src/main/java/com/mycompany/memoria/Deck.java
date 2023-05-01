@@ -27,13 +27,6 @@ public class Deck {
             }
         }
 
-        /*matrixCards = new Card[cardsPerRow][cardMatching];
-        for(int i=0;i<cardsPerRow;i++){
-            for(int j=0;j<cardMatching;j++){
-                this.matrixCards[i][j]=new Card(i);
-                utils.setImage(i,this.matrixCards[i][j]);
-            }
-        }*/
         cards = copyToArray(size);
     }
 
@@ -44,36 +37,15 @@ public class Deck {
         return cards;
     }
 
-    public boolean checkMatch(){
+    public boolean testAndMatch(){
         for(cardSet cardset:cardSets){
             if(cardset.checkMatch() && !cardset.isMatched()){
-                System.out.println("Match found");
                 cardset.match();
                 return true;
             }
         }
         return false;
-        /*
-        for(Card[] row:matrixCards){
-            boolean found=true;
-            for(Card card:row){
-                if(!card.IsFlipped() || card.IsMatched()){
-                    found=false;
-                    break;
-                }
-            }
-            if(found){
-                System.out.println("Match found");
 
-                for(Card card:row){
-                    System.out.println(card.toString());
-                    card.match();
-                }
-                return true;
-            }
-        }
-        return false;
-         */
     }
 
     public int getSize(){
@@ -122,6 +94,13 @@ public class Deck {
 
     public ArrayList<Card> getCards() {
         return cards;
+    }
+
+    public boolean allCardsMatched(){
+        for(cardSet cardSet:cardSets){
+            if(!cardSet.isMatched()) return false;
+        }
+        return true;
     }
 
     class cardSet{

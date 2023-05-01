@@ -10,6 +10,7 @@ public class Player {
     private FloatProperty score;
     private BooleanProperty currentTurn;
 
+
     public Player(String name) {
         this.name = name;
         this.score = new SimpleFloatProperty(0);
@@ -71,4 +72,5 @@ public class Player {
     public boolean isBot(){
         return false;
     }
+
 }
