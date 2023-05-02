@@ -35,7 +35,9 @@ public class Player {
     }
 
     public void punish(float value) {
-        this.score.set(this.score.get() - value);
+        float newScore = (this.score.get() - value);
+        newScore=newScore>0?newScore:0;
+        this.score.set(newScore);
     }
 
     public void resetScore() {
@@ -52,7 +54,7 @@ public class Player {
 
         Label playerName = new Label(name);
         Label playerScore = new Label();
-        playerScore.textProperty().bind(score.asString("Score: %.2f"));
+        playerScore.textProperty().bind(score.asString("Puntaje: %.2f"));
 
         hbox.getChildren().addAll(playerName, playerScore);
         hbox.styleProperty().bind(Bindings.when(currentTurn)

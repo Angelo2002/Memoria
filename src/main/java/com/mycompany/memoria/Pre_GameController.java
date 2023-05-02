@@ -316,6 +316,7 @@ public class Pre_GameController {
     public static void updateScores(ArrayList<Player> players) {
         for (Player player : players) {
             PlayerScoreLog existingScore = findScoreByPlayerName(player.getName());
+            if (player.isBot()) continue;
             if (existingScore != null) {
                 System.out.println("Existing score found for " + player.getName() + " adding " + player.getScore() + " points");
                 existingScore.addScore(player.getScore());

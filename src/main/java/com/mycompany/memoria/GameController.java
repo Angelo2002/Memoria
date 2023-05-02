@@ -330,7 +330,7 @@ public class GameController {
         winnersPane.setLayoutY(stackpane_table.getHeight() / 2 - winnersPane.getMinHeight() / 2);
         //genera texto de ganadores
         Label winnersLabel = new Label("Los ganadores son:\n" + getWinners());
-        winnersLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #000000;");
+        winnersLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #06c209;");
         winnersPane.getChildren().add(winnersLabel);
         //centra el texto
         winnersLabel.layoutXProperty().bind(winnersPane.widthProperty().subtract(winnersLabel.widthProperty()).divide(2));
@@ -362,17 +362,16 @@ public class GameController {
         });
 
         //añade animacion
-        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(2), winnersPane);
-        scaleTransition.setFromX(0);
-        scaleTransition.setFromY(0);
-        scaleTransition.setToX(1);
-        scaleTransition.setToY(1);
-        scaleTransition.play();
+        //ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(2), winnersPane);
+        //scaleTransition.setFromX(0);
+        //scaleTransition.setFromY(0);
+        //scaleTransition.setToX(1);
+        //scaleTransition.setToY(1);
+        //scaleTransition.play();
     }
 
 
-    private void winnersPopup(){ //TODO hacer bonito?
-       //showAnimatedText("Los ganadores son: " + getWinners());
+    private void winnersPopup(){
         showAnimatedWinnersPane();
     }
 
@@ -468,7 +467,7 @@ public class GameController {
 
         //Evita que se pueda hacer click en las cartas mientras se muestra el cambio de divergencia
         worldLinesChanging = true;
-
+        System.out.println("Cambio de cartas");
         Pane divergencePane = new Pane();
         divergencePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Color de fondo
         stackpane_table.getChildren().add(divergencePane);
