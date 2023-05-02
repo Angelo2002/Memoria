@@ -8,22 +8,26 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<AnchorPane fx:id="pane_game" prefHeight="700.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.Pre_GameController">
+<AnchorPane fx:id="pane_game" prefHeight="700.0" prefWidth="1366.0" stylesheets="@../../../stylesheetCardGame.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.Pre_GameController">
    <children>
       <VBox layoutX="70.0" layoutY="102.0" prefHeight="536.0" prefWidth="404.0">
          <children>
-            <HBox prefHeight="100.0" prefWidth="199.0">
+            <HBox prefHeight="35.0" prefWidth="404.0">
                <children>
-                  <Label text="Conjunto de cartas a reconocer: ">
+                  <Label prefHeight="23.0" prefWidth="395.0" text="Conjunto de cartas a reconocer: ">
                      <tooltip>
                         <Tooltip text="Cantidad de cartas iguales que deben seleccionarse para sumar puntos" />
                      </tooltip></Label>
-                  <TextField fx:id="txtfield_cardMatching" disable="true" prefHeight="52.0" prefWidth="39.0" text="2" />
+               </children>
+            </HBox>
+            <HBox prefHeight="65.0" prefWidth="404.0">
+               <children>
+                  <TextField fx:id="txtfield_cardMatching" disable="true" prefHeight="100.0" prefWidth="84.0" text="2" />
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Button fx:id="btn_incrementCardMatching" mnemonicParsing="false" onAction="#incrementCardMatching" prefHeight="25.0" prefWidth="48.0" text="+" />
@@ -35,7 +39,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Label text="Cantidad de Cartas: " />
-                  <TextField fx:id="textfield_amountCards" disable="true" prefHeight="51.0" prefWidth="43.0" text="4" />
+                  <TextField fx:id="textfield_amountCards" disable="true" prefHeight="95.0" prefWidth="72.0" text="4" />
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Button fx:id="btn_incrementCards" mnemonicParsing="false" onAction="#incrementCards" prefWidth="48.0" text="+" />
@@ -61,44 +65,54 @@
                         <Tooltip text="Permite ver las cartas con click derecho" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox mnemonicParsing="false" text="Tiempo límite" />
                </children>
             </HBox>
             <HBox prefHeight="52.0" prefWidth="404.0">
                <children>
-                  <VBox prefHeight="52.0" prefWidth="199.0">
+                  <VBox prefHeight="49.0" prefWidth="136.0">
                      <children>
                         <Label text="Minutos" />
-                        <Spinner />
+                        <Spinner fx:id="spin_minutes" />
                      </children>
                   </VBox>
-                  <VBox prefHeight="52.0" prefWidth="205.0">
+                  <VBox prefHeight="49.0" prefWidth="107.0">
                      <children>
                         <Label text="Segundos" />
-                        <Spinner />
+                        <Spinner fx:id="spin_seconds" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="49.0" prefWidth="164.0">
+                     <children>
+                        <HBox prefHeight="23.0" prefWidth="89.0" />
+                        <CheckBox fx:id="chkb_timeLimitOn" mnemonicParsing="false" prefHeight="16.0" prefWidth="152.0" text="Tiempo Partida" />
                      </children>
                   </VBox>
                </children>
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="btn_play" mnemonicParsing="false" onAction="#showGame" prefHeight="124.0" prefWidth="207.0" text="Iniciar" />
-               </children>
-            </HBox>
+                  <CheckBox fx:id="chkb_shuffleMidGame" mnemonicParsing="false" prefHeight="97.0" prefWidth="80.0" text="D-mails">
+                     <tooltip>
+                        <Tooltip text="Cambio de cartas a mitad de partida" />
+                     </tooltip>
+                  </CheckBox>
+                  <CheckBox fx:id="chkb_timedTurn" mnemonicParsing="false" prefHeight="97.0" prefWidth="127.0" text="Tiempo Turno" />
+               </children></HBox>
+            <Button fx:id="btn_play" mnemonicParsing="false" onAction="#showGame" prefHeight="124.0" prefWidth="207.0" text="Iniciar" />
          </children>
       </VBox>
-      <VBox layoutX="893.0" layoutY="75.0" prefHeight="585.0" prefWidth="357.0">
+      <VBox layoutX="923.0" layoutY="75.0" prefHeight="585.0" prefWidth="327.0">
          <children>
-            <TableView fx:id="tbl_globalscores"  prefHeight="594.0" prefWidth="357.0">
+            <TableView fx:id="tbl_globalscores" prefHeight="585.0" prefWidth="382.0">
               <columns>
-                <TableColumn fx:id="col_playerName" prefWidth="231.0" text="Nombre" >
+                <TableColumn fx:id="col_playerName" prefWidth="181.0" text="Nombre">
                    <cellValueFactory>
-                      <PropertyValueFactory property="playerName"/>
+                      <PropertyValueFactory property="playerName" />
                    </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="col_playerScore" prefWidth="125.0" text="Puntaje">
+                <TableColumn fx:id="col_playerScore" prefWidth="175.0" text="Puntaje">
                    <cellValueFactory>
-                      <PropertyValueFactory property="totalScore"/>
+                      <PropertyValueFactory property="totalScore" />
                    </cellValueFactory>
                 </TableColumn>
               </columns>
@@ -106,10 +120,10 @@
             </TableView>
          </children>
       </VBox>
-      <VBox fx:id="vbox_addplayers" layoutX="474.0" layoutY="94.0" prefHeight="585.0" prefWidth="327.0">
+      <VBox fx:id="vbox_addplayers" layoutX="459.0" layoutY="78.0" prefHeight="585.0" prefWidth="431.0">
          <children>
-            <Button fx:id="btn_addPlayer" mnemonicParsing="false" onAction="#add_player" text="Añadir Jugador" />
-            <Button fx:id="btn_addBot" mnemonicParsing="false" onAction="#add_cpu" prefHeight="25.0" prefWidth="97.0" text="Añadir CPU" />
+            <Button fx:id="btn_addPlayer" mnemonicParsing="false" onAction="#add_player" prefHeight="47.0" prefWidth="220.0" text="Añadir Jugador" />
+            <Button fx:id="btn_addBot" mnemonicParsing="false" onAction="#add_cpu" prefHeight="47.0" prefWidth="221.0" text="Añadir CPU" />
          </children>
       </VBox>
    </children>

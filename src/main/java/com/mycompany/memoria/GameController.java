@@ -1,7 +1,6 @@
 package com.mycompany.memoria;
 
 import javafx.animation.*;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,19 +11,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -48,8 +47,9 @@ public class GameController {
     int playerCounter = 0;
     ArrayList<Player> players;
     Deck deck;
-    boolean gameEnded = false;
-    boolean gameRunning = false;
+    private boolean gameEnded = false;
+    private boolean gameRunning = false;
+    private boolean worldLinesChanging = false;
     private int timeLeft = 0;
 
     @FXML
@@ -70,14 +70,22 @@ public class GameController {
         fillTable();
         deck = new Deck(amountCards, cardMatching);
         deck.assignRandomCardsToButtons(buttonsOnTable);
+        boolean timercssAdded = lbl_timer.getStyleClass().add("label-timer");
+        System.out.printf("Timer css added: %b\n", timercssAdded);
         setImagesToButtons();
         if(Ruleset.bonus){
             Ruleset.bonusValue=1;
         }
-
-
-
     }
+
+    @FXML
+    private void startGame(ActionEvent actionEvent) {
+        gameRunning = true;
+        startIfBotIsFirst();
+        btn_ready.setDisable(true);
+        if(Ruleset.timeLimitOn) createGameTimer(Ruleset.matchtime).play();
+    }
+
 
     public void setPlayerCounter() {
         playerCounter = players.size();
@@ -138,6 +146,7 @@ public class GameController {
         btn.setPrefWidth(buttonWidth);
         btn.setPrefHeight(buttonWidth * 1.5);
         btn.setOnMouseClicked(this::ActionFlipCard);
+        btn.getStyleClass().add("card-button");
         buttonsOnTable.add(btn);
         hbox.getChildren().add(btn);
     }
@@ -172,6 +181,12 @@ public class GameController {
     }
 
     private void cardFlipLogistics(Card card) {
+        if(worldLinesChanging || cardDelay){
+            if(checkBotTurn()) {
+                System.out.println("Bot turn affected");botTurn();}
+            return;
+        }
+
         addSeenCardAllBots(card);
         card.flip();
         flipCounter++;
@@ -233,14 +248,14 @@ public class GameController {
         if (!gameRunning || gameEnded) {
             return;
         }
+
         botTurn = true;
         BotPlayer bot = (BotPlayer) players.get(turnCounter);
-        PauseTransition pause = new PauseTransition(Duration.seconds(5));
+        PauseTransition pause = new PauseTransition(Duration.seconds(Math.random()*3+1));
         pause.setOnFinished(event -> {
             Card card = bot.chooseCardAlgorithm(cardMatching, deck.getCards());
-            int previousStreak = streakCounter;
             cardFlipLogistics(card);
-            if (previousStreak != streakCounter) {
+            if (flipCounter == 0) {
                 bot.resetBotTurn();
             }
             if (!bot.isCurrentTurn()){
@@ -249,13 +264,6 @@ public class GameController {
             }
         });
         pause.play();
-
-        /*ArrayList<Card> botChoices = bot.chooseCards(cardMatching, deck.getCards());
-        for (int i = 0; i < cardMatching; i++) {
-            Card card = botChoices.get(i);
-            cardFlipLogistics(card);
-            }
-         */
     }
 
     private void addSeenCardAllBots(Card card){
@@ -299,25 +307,6 @@ public class GameController {
         return winnerString.toString();
     }
 
-    private void showAnimatedText(String textContent) {
-        Text text = new Text(textContent);
-        text.setFont(new Font(24));
-        text.setLayoutX(stackpane_table.getWidth() / 2 - text.getLayoutBounds().getWidth() / 2);
-        text.setLayoutY(stackpane_table.getHeight() / 2 - text.getLayoutBounds().getHeight() / 2);
-
-        stackpane_table.getChildren().add(text);
-
-        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(2), text);
-        scaleTransition.setFromX(0);
-        scaleTransition.setFromY(0);
-        scaleTransition.setToX(1);
-        scaleTransition.setToY(1);
-        scaleTransition.play();
-
-        scaleTransition.setOnFinished(event -> {
-            // Aquí puedes agregar acciones adicionales cuando termine la animación
-        });
-    }
 
 
     private void showAnimatedWinnersPane(){
@@ -394,28 +383,28 @@ public class GameController {
     private void endGame(){
         gameEnded = true;
         gameRunning = false;
-
+        updatePlayerGlobalScore();
+        winnersPopup();
     }
 
     private void checkAndEndGame() {
         if(deck.allCardsMatched()){
             endGame();
-            updatePlayerGlobalScore();
-            winnersPopup();
         }
     }
 
-
-    @FXML
-    private void startGame(ActionEvent actionEvent) {
-        gameRunning = true;
-        startIfBotIsFirst();
-        btn_ready.setDisable(true);
-        createGameTimer(Ruleset.matchtime).play();
+    private void eraseSeenCardsFromBots(){
+        for(Player player : players){
+            if(player.isBot() && !((BotPlayer)player).isCheating()){
+                ((BotPlayer)player).setSeenCards(new ArrayList<>());
+            }
+        }
     }
 
     private void shuffleMidGame(){
+        Ruleset.shuffleMidGame = false;
         deck.shuffleCards();
+        eraseSeenCardsFromBots();
         ArrayList<Card> cards = deck.getCards();
         int i =0;
         for(Button button : buttonsOnTable){
@@ -425,30 +414,13 @@ public class GameController {
             else if(!button.isDisabled() && card.IsMatched()) button.setDisable(true);
             i++;
         }
+        playSound("/readingsteiner.mp3");
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
         showChangingDivergence();
-
-        Ruleset.timeShuffle = false;
-        //make an animation
-        //first load "\\src\\main\\java\\com\\mycompany\\images\\timeline_change.gif";
-       /*
-        String path = "./\\src\\main\\java\\com\\mycompany\\images\\timeline_change.gif";
-        File file = new File(path);
-        if (!file.exists()) {
-            System.out.println("File not found");
-            return;
-        }
-        path = file.toURI().toString();
-        Image gifImage = new Image(path);
-        ImageView gifImageView = new ImageView(gifImage);
-        stackpane_table.getChildren().add(gifImageView);
-        PauseTransition pause = new PauseTransition(Duration.seconds(2));
-        pause.setOnFinished(event -> {
-            Platform.runLater(() -> removeGif(gifImageView));
-
-        });
-
-        */
-        updateAllButtonGraphics(buttonsOnTable);
+        //updateAllButtonGraphics(buttonsOnTable);
+        //showChangingDivergence();
+        //Ruleset.shuffleMidGame = false;
+        //updateAllButtonGraphics(buttonsOnTable);
 
     }
     private String generateRandomDivergence() {
@@ -456,55 +428,25 @@ public class GameController {
         return String.format("%.6f", randomValue);
     }
 
-    private void showChangingDivergence() {
-        // Crear el pane y agregarlo a la escena
-        Pane divergencePane = new Pane();
-        divergencePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);"); // Color de fondo
-        stackpane_table.getChildren().add(divergencePane);
 
-        // Crear la etiqueta de texto con números cambiantes
-        Label divergenceLabel = new Label();
-        divergenceLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: orange;"); // Estilo de la etiqueta
-        divergenceLabel.setText(generateRandomDivergence());
-        divergencePane.getChildren().add(divergenceLabel);
-        divergenceLabel.setLayoutX(100); // Ajusta la posición X e Y según sea necesario
-        divergenceLabel.setLayoutY(100);
-
-        // Crear la animación de cambio de números
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
-            divergenceLabel.setText(generateRandomDivergence());
-        }));
-        timeline.setCycleCount(50); // Cambia este valor para controlar cuántas veces se actualizan los números
-        timeline.setOnFinished(event -> {
-            // Crear la animación de desvanecimiento
-            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), divergencePane);
-            fadeTransition.setFromValue(1.0);
-            fadeTransition.setToValue(0.0);
-            fadeTransition.setOnFinished(fadeEvent -> stackpane_table.getChildren().remove(divergencePane));
-            fadeTransition.play();
-        });
-        timeline.play();
-    }
-
-
-    private void removeGif(ImageView gifImageView){
-        stackpane_table.getChildren().remove(gifImageView);
-    }
 
     private Timeline createGameTimer(int timeLimitInSeconds) {
         timeLeft = timeLimitInSeconds;
 
-        //envuelve un timeline para poder modificarlo dentro del evento
+        //Envuelve un timeline para poder modificarlo dentro del evento
+        //El compilador me da error si no lo hago así, "Timeline" puede que no se haya instanciado al modificarlo.
         Timeline[] timelineWrapper = new Timeline[1];
         timelineWrapper[0] = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            if ((timeLeft <= Ruleset.matchtime/2) && (timeLeft!=0) && Ruleset.timeShuffle) {
+            if ((timeLeft <= Ruleset.matchtime/2) && (timeLeft!=0) && Ruleset.shuffleMidGame) {
                 System.out.println(timeLeft/2+ " " + Ruleset.matchtime);
                 lbl_timer.setTextFill(Color.RED);
                 shuffleMidGame();
             }
             else if (timeLeft > 0) {
                 decrementTime();
-                lbl_timer.setText(String.valueOf(timeLeft));
+                lbl_timer.setText(timeLeft / 60 + String.valueOf(timeLeft%60));
+            }else if(gameEnded){
+              timelineWrapper[0].stop();
             } else {
                 timelineWrapper[0].stop();
                 endGame();
@@ -521,4 +463,89 @@ public class GameController {
     private void decrementTime(){
         timeLeft--;
     }
+
+    private void showChangingDivergence() {
+
+        //Evita que se pueda hacer click en las cartas mientras se muestra el cambio de divergencia
+        worldLinesChanging = true;
+
+        Pane divergencePane = new Pane();
+        divergencePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Color de fondo
+        stackpane_table.getChildren().add(divergencePane);
+
+        // Crea la etiqueta para el número de divergencia
+        Label divergenceLabel = new Label();
+        divergenceLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: orange;"); // Estilo de la etiqueta
+        divergenceLabel.setText(generateRandomDivergence());
+        divergencePane.getChildren().add(divergenceLabel);
+        divergenceLabel.setLayoutX(100); // Ajusta la posición X e Y según sea necesario
+        divergenceLabel.setLayoutY(100);
+
+        // Crea una segunda etiqueta que se sobrepone a la primera
+        Label secondDivergenceLabel = new Label();
+        secondDivergenceLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: orange;"); // Estilo de la etiqueta
+        secondDivergenceLabel.setText(generateRandomDivergence());
+        divergencePane.getChildren().add(secondDivergenceLabel);
+        secondDivergenceLabel.setLayoutX(100); // Ajusta la posición X e Y según sea necesario
+        secondDivergenceLabel.setLayoutY(100);
+
+        // Animación de cambio de números para ambas etiquetas
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+            divergenceLabel.setText(generateRandomDivergence());
+            secondDivergenceLabel.setText(generateRandomDivergence());
+        }));
+        timeline.setCycleCount(60); //ciclo de animacion
+
+        // Animación aleatoria de opacidad para efecto de parpadeo
+        Timeline opacityTimeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+            double randomOpacity = Math.random() * 0.9;
+            secondDivergenceLabel.setOpacity(randomOpacity);
+        }));
+        opacityTimeline.setCycleCount(60);
+        opacityTimeline.setOnFinished(event -> {
+            divergencePane.getChildren().remove(secondDivergenceLabel);
+        });
+
+        // Animación de agitación
+        TranslateTransition shakeTransition = new TranslateTransition(Duration.millis(50), divergenceLabel);
+        shakeTransition.setByX(10);
+        shakeTransition.setCycleCount(6);
+        shakeTransition.setAutoReverse(true);
+        shakeTransition.setOnFinished(event -> updateAllButtonGraphics(buttonsOnTable));
+
+        // Animación de desvanecimiento del pane
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), divergencePane);
+        fadeTransition.setFromValue(1.0);
+        fadeTransition.setToValue(0.0);
+        fadeTransition.setOnFinished(fadeEvent -> stackpane_table.getChildren().remove(divergencePane));
+
+        // Secuencia de animaciones
+        SequentialTransition sequentialTransition = new SequentialTransition();
+        sequentialTransition.getChildren().addAll(new ParallelTransition(timeline, opacityTimeline), shakeTransition, fadeTransition);
+        sequentialTransition.setOnFinished(event -> {
+            divergenceLabel.setText(generateRandomDivergence());
+            stackpane_table.getChildren().remove(divergencePane);
+            worldLinesChanging = false;
+        });
+        sequentialTransition.play();
+    }
+
+    private void playSound(String soundResourcePath) {
+        try {
+            URL resourceURL = getClass().getResource(soundResourcePath);
+            if (resourceURL == null) {
+                System.out.println("No se ha encontrado el archivo de sonido: " + soundResourcePath);
+                return;
+            }
+            Media sound = new Media(resourceURL.toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer.play();
+
+        } catch (Exception e) {
+            System.out.println("Error al reproducir el efecto de sonido: " + e.getMessage());
+        }
+    }
+
 }
+
+

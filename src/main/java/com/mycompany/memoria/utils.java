@@ -13,13 +13,13 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class utils {
-    static final String path = "/images/";
     static final String extension = ".png";
     static final double cardRatio = 1.5; //Las cartas son cardRatio veces mas altas que anchas.
-
+    static final String projectImagesPath = "\\src\\main\\java\\com\\mycompany\\images";
+    static final String projectResourcesPath = "\\src\\main\\resources\\com\\mycompany\\memory";
     //TODO cambiar a void
     public static boolean setImage(int imageNumber, Card card) {
-        File file = retrieveImage(path+imageNumber+extension);
+        File file = retrieveImage(projectImagesPath+imageNumber+extension);
         if (file.exists()) {
             System.out.println("Image found");
             ImageView image = new ImageView(new Image(file.toURI().toString()));

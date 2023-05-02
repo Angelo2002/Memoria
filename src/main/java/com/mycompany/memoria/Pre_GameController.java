@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -52,6 +53,16 @@ public class Pre_GameController {
 
 
     static ArrayList<PlayerScoreLog> scores = new ArrayList<>();
+    @FXML
+    private CheckBox chkb_shuffleMidGame;
+    @FXML
+    private CheckBox chkb_timedTurn;
+    @FXML
+    private CheckBox chkb_timeLimitOn;
+    @FXML
+    private Spinner spin_seconds;
+    @FXML
+    private Spinner spin_minutes;
 
 
     public Pre_GameController() {
@@ -83,16 +94,11 @@ public class Pre_GameController {
                 }
             }
         });
+
+        spin_seconds.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
+        spin_minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Ruleset.maxMinutes, 0));
+
         /*
-        tbl_globalscores.sceneProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                updateScoreTable();
-            }
-            System.out.println("Pre_GameController initialized");
-        });
-
-         */
-
         col_playerScore.setCellFactory(column -> new TableCell<PlayerScoreLog, Float>() {
             @Override
             protected void updateItem(Float item, boolean empty) {
@@ -107,6 +113,8 @@ public class Pre_GameController {
                 }
             }
         });
+         */
+
         //run later
         Platform.runLater(this::updateScoreTable);
     }
@@ -182,7 +190,7 @@ public class Pre_GameController {
         Button deleteButton = new Button("Eliminar");
 
         // Crear un HBox para agregar el TextField, ComboBox y el botón de eliminar
-        HBox hBox = new HBox(textField, difficultyComboBox, deleteButton);
+        HBox hBox = new HBox(textField, deleteButton, difficultyComboBox);
         hBox.setSpacing(10);
 
         // Agregar el HBox en la posición adecuada
@@ -191,21 +199,20 @@ public class Pre_GameController {
         // Funcionalidad del botón de eliminar
         deleteButton.setOnAction(e -> {
             vbox_addplayers.getChildren().remove(hBox);
-            cpuCounter--;
             updateCpuNames();
         });
     }
 
     private void updateCpuNames() {
 
-        int cpuNum = 1;
+        cpuCounter = 0;
         for (Node node : vbox_addplayers.getChildren()) {
             if (node instanceof HBox) {
                 HBox hBox = (HBox) node;
                 if (hBox.getChildren().get(0) instanceof TextField) {
                     TextField textField = (TextField) hBox.getChildren().get(0);
                     if (textField.getText().startsWith("CPU#")) {
-                        textField.setText("CPU#" + cpuNum++);
+                        textField.setText("CPU#" + cpuCounter++);
                     }
                 }
             }
@@ -225,7 +232,9 @@ public class Pre_GameController {
             game_controller.setPlayerCounter();
             // Create a new scene with the loaded FXML file
             Scene gameScene = new Scene(root, 1366, 700);
-
+            File stylesheet = new File("/."+utils.projectResourcesPath+"stylesheetCardGame.css");
+            boolean added=gameScene.getStylesheets().add("stylesheetCardGame.css");
+            System.out.println("Stylesheet added: "+added);
             // Get the current stage from the action event
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             // Set the new scene and show the stage
@@ -241,8 +250,18 @@ public class Pre_GameController {
         Ruleset.godMode = chkb_godMode.isSelected();
         Ruleset.bonus = chkb_bonus.isSelected();
         Ruleset.punishmentExists = chkb_punishment.isSelected();
+        Ruleset.shuffleMidGame = chkb_shuffleMidGame.isSelected();
+        Ruleset.timeLimitOn = chkb_timeLimitOn.isSelected();
+        if(Ruleset.timeLimitOn) Ruleset.matchtime = fetchTimeLimit();
+        Ruleset.timePerTurnOn = chkb_timedTurn.isSelected();
+
     }
 
+    int fetchTimeLimit(){
+        int timeLimit = Integer.parseInt(spin_minutes.getValue().toString())*60;
+        timeLimit += Integer.parseInt(spin_seconds.getValue().toString());
+        return timeLimit;
+    }
 
     private ArrayList<Player> collectPlayersData() {
         ArrayList<Player> players = new ArrayList<>();
@@ -256,7 +275,7 @@ public class Pre_GameController {
                 if (isHuman) {
                     players.add(new Player(playerName));
                 } else {
-                    ComboBox<String> difficultyComboBox = (ComboBox<String>) hBox.getChildren().get(1);
+                    ComboBox<String> difficultyComboBox = (ComboBox<String>) hBox.getChildren().get(2);
                     String difficulty = difficultyComboBox.getValue();
                     double accuracy; boolean cheater=false;
                     switch (difficulty) {

@@ -20,7 +20,7 @@ public class BotPlayer extends Player{
     }
 
     public void setSeenCards(ArrayList<Card> seenCards) {
-        this.seenCards = seenCards;
+        this.seenCards =  new ArrayList<>(seenCards);
     }
 
     public void resetSeenCards(){
@@ -174,6 +174,9 @@ public class BotPlayer extends Player{
         return availableCards.get(index);
     }
 
+    /*
+    Elimina la lista de cartas que ha escogido durante el turno, para que no interfieran con el algoritmo de escoger cartas
+     */
     public void resetBotTurn(){
         cardsChosen = new ArrayList<>();
     }
