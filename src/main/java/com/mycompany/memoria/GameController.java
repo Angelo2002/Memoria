@@ -68,6 +68,7 @@ public class GameController {
         gpane_table = new GridPane();
         gpane_table.setGridLinesVisible(true);
         fillTable();
+        stackpane_table.getStyleClass().add("stack-pane-table");
         deck = new Deck(amountCards, cardMatching);
         deck.assignRandomCardsToButtons(buttonsOnTable);
         boolean timercssAdded = lbl_timer.getStyleClass().add("label-timer");
@@ -125,6 +126,7 @@ public class GameController {
         VBox.setVgrow(gpane_table, Priority.ALWAYS);
         addButtonsToGridPane(gpane_table, rows, columns, amountCards, buttonWidth);
         stackpane_table.getChildren().add(gpane_table);
+        
     }
     //TODO on action
     private void addButtonsToGridPane(GridPane gp, int rows, int columns, int amount, double buttonWidth) {

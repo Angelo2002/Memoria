@@ -9,7 +9,7 @@
 .root {
     -fx-background-image: url("circles_steinsbg.jpg");
     -fx-background-size: cover;
-    -fx-background-repeat: no-repeat;
+    -fx-background-repeat: repeat;
     -fx-background-position: center;
 }
 
@@ -43,7 +43,7 @@
 }
 
 /* Estilo para el contenedor principal */
-#main-container {
+.anchor-pane {
     -fx-background-color: rgba(34, 34, 34, 0.7);
     -fx-padding: 20px;
     -fx-border-radius: 5px;
@@ -51,7 +51,8 @@
 
 /* Estilo de los botones de las cartas */
 .card-button {
-    -fx-background-color: rgba(66, 66, 66, 0.8);
+    -fx-background-color: rgba(66, 66, 66, 0.1);
+    -fx-opacity: 0.8;
     -fx-border-width: 2px;
     -fx-border-style: solid;
     -fx-border-color: #4CAF50;
@@ -96,4 +97,12 @@
 .text-element {
     -fx-text-fill: #4CAF50;
     -fx-font-size: 18px;
+}
+
+.stack-pane-table{
+    -fx-background-image: url("timemachine.png");
+    -fx-background-repeat: no-repeat;
+     -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-effect: dropshadow(gaussian, orange, 10, 0, 0, 0);
 }
