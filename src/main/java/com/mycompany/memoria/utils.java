@@ -67,6 +67,8 @@ public class utils {
     public static void updateButtonGraphics(Button button){
         Card card = (Card) button.getUserData();
         button.setGraphic(card.getCurrentImage());
+        button.getStyleClass().add(card.getGodSight() ? "card-button-god-sight" : "card-button");
+        button.getStyleClass().remove(card.getGodSight() ? "card-button": "card-button-god-sight");
     }
 
     public static void updateAllButtonGraphics(ArrayList<Button> buttons){
@@ -81,6 +83,24 @@ public class utils {
             hBoxes.add(player.playerToHBox());
         }
         return hBoxes;
+    }
+
+    public static boolean playerArrayHasDuplicates(ArrayList<Player> players){
+        if (players.size() == 0) return false;
+        for(int i = 0; i < players.size(); i++){
+            for(int j = i+1; j < players.size(); j++){
+                if(players.get(i).getName().equals(players.get(j).getName())) return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean playerArrayHasEmptyNames(ArrayList<Player> players){
+        if (players.size() == 0) return false;
+        for(Player player:players){
+            if(player.getName().equals("")) return true;
+        }
+        return false;
     }
 
     static boolean cardArrayIsHomogenous(ArrayList<Card> cards){
@@ -98,6 +118,33 @@ public class utils {
             if(card1.getCardID() != ID) return false;
         }
         return true;
+    }
+
+    static void checkThreads(){
+        // Obtener el grupo de hilos principal (main thread group)
+        ThreadGroup mainThreadGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup topThreadGroup = mainThreadGroup;
+
+        // Buscar el grupo de hilos de nivel superior
+        while (topThreadGroup.getParent() != null) {
+            topThreadGroup = topThreadGroup.getParent();
+        }
+
+        // Obtener una estimación del número total de hilos activos en la aplicación
+        int estimatedThreadCount = topThreadGroup.activeCount();
+
+        // Crear un arreglo de hilos lo suficientemente grande como para contener todos los hilos activos
+        Thread[] threads = new Thread[estimatedThreadCount];
+
+        // Llenar el arreglo con todos los hilos activos en la aplicación
+        int threadCount = topThreadGroup.enumerate(threads);
+
+        // Recorrer el arreglo e imprimir información sobre cada hilo
+        for (int i = 0; i < threadCount; i++) {
+            Thread thread = threads[i];
+            System.out.println("Hilo " + (i + 1) + ": " + thread.getName() + " (ID: " + thread.getId() + ", Estado: " + thread.getState() + ")");
+        }
+
     }
 
 }

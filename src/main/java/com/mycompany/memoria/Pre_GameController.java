@@ -1,6 +1,5 @@
 package com.mycompany.memoria;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,8 +35,8 @@ public class Pre_GameController {
     private Button btn_addPlayer;
     @FXML
     private VBox vbox_addplayers;
-
-    int cpuCounter=0;
+    private boolean warning_tooManyCards_Shown;
+    private int cpuCounter=0;
     @FXML
     private CheckBox chkb_godMode;
     @FXML
@@ -63,6 +62,8 @@ public class Pre_GameController {
     private Spinner spin_seconds;
     @FXML
     private Spinner spin_minutes;
+    @FXML
+    private Button btn_about;
 
 
     public Pre_GameController() {
@@ -75,65 +76,47 @@ public class Pre_GameController {
     private void initialize() {
 
         cardMatching = 2;
-        amountCards = 4;
+        amountCards = 6;
         buttonSize = 100;
-
+        warning_tooManyCards_Shown = false;
         col_playerName.setCellValueFactory(new PropertyValueFactory<>("playerName"));
         col_playerScore.setCellValueFactory(new PropertyValueFactory<>("totalScore"));
-        col_playerName.setCellFactory(column -> new TableCell<PlayerScoreLog, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    System.out.println("Null");
-                } else {
-                    setText(item);
-                    System.out.println("Nombre del jugador: " + item);
-                }
-            }
-        });
+        System.out.println("Added or not: " + tbl_globalscores.getStyleClass().add("tableview-scores"));
 
         spin_seconds.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
         spin_minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Ruleset.maxMinutes, 0));
 
-        /*
-        col_playerScore.setCellFactory(column -> new TableCell<PlayerScoreLog, Float>() {
-            @Override
-            protected void updateItem(Float item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    System.out.println("Null");
-                } else {
-                    setText(Float.toString(item));
-                    System.out.println("Puntaje: " + item);
-                }
-            }
-        });
-         */
-
         //run later
-        Platform.runLater(this::updateScoreTable);
+        updateCheckBoxfromRuleset();
+       updateScoreTable();
+    }
+
+    private void updateCheckBoxfromRuleset() {
+        chkb_godMode.setSelected(Ruleset.godMode);
+        chkb_bonus.setSelected(Ruleset.bonus);
+        chkb_punishment.setSelected(Ruleset.punishmentExists);
+        chkb_shuffleMidGame.setSelected(Ruleset.shuffleMidGame);
+        chkb_timedTurn.setSelected(Ruleset.timePerTurnOn);
+        chkb_timeLimitOn.setSelected(Ruleset.timeLimitOn);
     }
 
     @FXML
     private void incrementCardMatching(ActionEvent actionEvent) {
         int prev = Integer.parseInt(txtfield_cardMatching.getText());
         cardMatching = prev+1;
-
         adjustCards();
         txtfield_cardMatching.setText(String.valueOf(cardMatching));
+
     }
 
     private void adjustCards() { //Ajusta las cartas para que sean multiplos de cardMatching
-        if (amountCards< cardMatching)
-            amountCards = cardMatching;
-        if (amountCards% cardMatching != 0)
-            amountCards = amountCards + (cardMatching - (amountCards% cardMatching));
-            textfield_amountCards.setText(String.valueOf(amountCards));
+        if (amountCards< cardMatching)  amountCards = cardMatching;
+        if (amountCards% cardMatching != 0) amountCards = amountCards + (cardMatching - (amountCards% cardMatching));
+        textfield_amountCards.setText(String.valueOf(amountCards));
+        if(!warning_tooManyCards_Shown && amountCards >= 18){
+            warning_tooManyCards_Shown = true;
+            warning_TooManyCards();
+        }
     }
 
     @FXML
@@ -152,6 +135,10 @@ public class Pre_GameController {
         int prev = Integer.parseInt(textfield_amountCards.getText());
         amountCards = prev+ cardMatching;
         textfield_amountCards.setText(String.valueOf(amountCards));
+        if(!warning_tooManyCards_Shown && amountCards >= 18){
+            warning_tooManyCards_Shown = true;
+            warning_TooManyCards();
+        }
     }
 
     @FXML
@@ -219,23 +206,54 @@ public class Pre_GameController {
         }
     }
 
+
     @FXML
     private void showGame(ActionEvent actionEvent) {
         try {
+            ArrayList<Player> players = collectPlayersData();
+            if(players.size() == 0)
+            {
+                alert_noPlayers();
+                return;
+            }
+            if(utils.playerArrayHasEmptyNames(players))
+            {
+                alert_playersWithoutName();
+                return;
+            }
+
+            if(utils.playerArrayHasDuplicates(players))
+            {
+                alert_repeatedPlayers();
+                return;
+            }
+
+
             fetchRules();
-            // Load the Game.fxml file
+            if(Ruleset.shuffleMidGame && !Ruleset.timeLimitOn)
+            {
+                alert_shuffleMidGameNoTimer();
+                return;
+            }
+            if(Ruleset.timeLimitOn && Ruleset.matchtime<20){
+                alert_timeLimitTooShort();
+                return;
+            }
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
             Parent root = loader.load();
 
             GameController game_controller = loader.getController();
-            game_controller.setPlayers(collectPlayersData());
+
+            game_controller.setPlayers(players);
             game_controller.setPlayerCounter();
-            // Create a new scene with the loaded FXML file
+
+
             Scene gameScene = new Scene(root, 1366, 700);
-            File stylesheet = new File("/."+utils.projectResourcesPath+"stylesheetCardGame.css");
+
             boolean added=gameScene.getStylesheets().add("stylesheetCardGame.css");
-            System.out.println("Stylesheet added: "+added);
-            // Get the current stage from the action event
+            System.out.println("Stylesheet added: " + added); //Para ver si se añadió el stylesheet
+
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             // Set the new scene and show the stage
             currentStage.setScene(gameScene);
@@ -244,6 +262,62 @@ public class Pre_GameController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    private void warning_TooManyCards(){
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Aviso");
+        alert.setHeaderText("Demasiadas cartas");
+        alert.setContentText("Añadir más cartas puede romper el tablero de juego");
+        alert.showAndWait();
+        return;
+    }
+
+    private void alert_timeLimitTooShort() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("No se puede activar Tiempo Partida");
+        alert.setContentText("Se requiere un tiempo mínimo de 20 segundos para jugar");
+        alert.showAndWait();
+        return;
+    }
+
+    private void alert_shuffleMidGameNoTimer() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("No hay temporizador");
+        alert.setContentText("No se puede barajar el tablero a la mitad del juego si no hay un temporizador");
+        alert.showAndWait();
+        return;
+    }
+
+    private void alert_repeatedPlayers() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Jugadores repetidos");
+        alert.setContentText("No puede haber jugadores con el mismo nombre");
+        alert.showAndWait();
+        return;
+    }
+
+    private void alert_playersWithoutName() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Jugadores sin nombre");
+        alert.setContentText("Todos los jugadores deben tener un nombre");
+        alert.showAndWait();
+        return;
+    }
+
+    private void alert_noPlayers() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("No hay jugadores");
+        alert.setContentText("Debe haber al menos un jugador para iniciar el juego");
+        alert.showAndWait();
+        return;
     }
 
     private void fetchRules(){
@@ -304,11 +378,7 @@ public class Pre_GameController {
 
     public void updateScoreTable(){
 
-        //col_playerName.setSortType(TableColumn.SortType.ASCENDING);
-        //col_playerScore.setSortType(TableColumn.SortType.ASCENDING);
-        tbl_globalscores.refresh();
         tbl_globalscores.setItems(FXCollections.observableArrayList(scores));
-        //System.out.println("Col Name"+col_playerName.getCellObservableValue(0).getValue());
         System.out.println("Scores updated" + tbl_globalscores.getItems().size());
 
     }
@@ -337,6 +407,30 @@ public class Pre_GameController {
         }
         return null;
     }
+
+    @FXML
+    private void about(ActionEvent actionEvent) {
+
+        Pane aboutPane = new Pane();
+        aboutPane.setPrefSize(400, 300);
+        Label aboutLabel = new Label("Juego de Cartas\n"+
+                "Versión 1.0\n" +
+                "Desarrollado por:\n" +
+                "Angelo José Marín Granados\n" +
+                "Programación II\n"+
+                "Ingeniería en Computación\n" +
+                "Universidad Nacional de Costa Rica\n" +
+                "Primer Ciclo 2023"
+                );
+        aboutLabel.setLayoutX(50);
+        aboutLabel.setLayoutY(50);
+        aboutPane.getChildren().add(aboutLabel);
+        Scene aboutScene = new Scene(aboutPane);
+        Stage aboutStage = new Stage();
+        aboutStage.setScene(aboutScene);
+        aboutStage.show();
+    }
+
 
 }
 

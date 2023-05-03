@@ -50,17 +50,17 @@
             </HBox>
             <HBox prefHeight="48.0" prefWidth="340.0" spacing="10.0">
                <children>
-                  <CheckBox fx:id="chkb_punishment" mnemonicParsing="false" text="Castigo">
+                  <CheckBox fx:id="chkb_punishment" mnemonicParsing="false" prefHeight="41.0" prefWidth="112.0" text="Castigo">
                      <tooltip>
                         <Tooltip text="Resta puntos si se falla la primera pareja del turno" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox fx:id="chkb_bonus" mnemonicParsing="false" text="Bonus">
+                  <CheckBox fx:id="chkb_bonus" mnemonicParsing="false" prefHeight="41.0" prefWidth="110.0" text="Bonus">
                      <tooltip>
                         <Tooltip text="Puntos Aumentados por racha de parejas" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox fx:id="chkb_godMode" mnemonicParsing="false" text="Modo Revisión">
+                  <CheckBox fx:id="chkb_godMode" mnemonicParsing="false" prefHeight="41.0" prefWidth="170.0" text="Modo Revisión">
                      <tooltip>
                         <Tooltip text="Permite ver las cartas con click derecho" />
                      </tooltip>
@@ -84,24 +84,24 @@
                   <VBox prefHeight="49.0" prefWidth="164.0">
                      <children>
                         <HBox prefHeight="23.0" prefWidth="89.0" />
-                        <CheckBox fx:id="chkb_timeLimitOn" mnemonicParsing="false" prefHeight="16.0" prefWidth="152.0" text="Tiempo Partida" />
                      </children>
                   </VBox>
                </children>
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <CheckBox fx:id="chkb_shuffleMidGame" mnemonicParsing="false" prefHeight="97.0" prefWidth="80.0" text="D-mails">
+                  <CheckBox fx:id="chkb_timeLimitOn" mnemonicParsing="false" prefHeight="88.0" prefWidth="214.0" text="Tiempo Partida" />
+                  <CheckBox fx:id="chkb_shuffleMidGame" mnemonicParsing="false" prefHeight="93.0" prefWidth="146.0" text="D-mails">
                      <tooltip>
                         <Tooltip text="Cambio de cartas a mitad de partida (requiere Tiempo Partida)" />
                      </tooltip>
                   </CheckBox>
-                  <CheckBox fx:id="chkb_timedTurn" mnemonicParsing="false" prefHeight="97.0" prefWidth="127.0" text="Tiempo x Turno" />
+                  <CheckBox fx:id="chkb_timedTurn" mnemonicParsing="false" prefHeight="93.0" prefWidth="216.0" text="Tiempo x Turno" />
                </children></HBox>
-            <Button fx:id="btn_play" mnemonicParsing="false" onAction="#showGame" prefHeight="124.0" prefWidth="207.0" text="Iniciar" />
+            <Button fx:id="btn_play" mnemonicParsing="false" onAction="#showGame" prefHeight="124.0" prefWidth="207.0" text="Jugar" />
          </children>
       </VBox>
-      <VBox layoutX="923.0" layoutY="75.0" prefHeight="585.0" prefWidth="327.0">
+      <VBox alignment="BOTTOM_RIGHT" layoutX="923.0" layoutY="75.0" prefHeight="585.0" prefWidth="327.0" spacing="5.0">
          <children>
             <TableView fx:id="tbl_globalscores" prefHeight="585.0" prefWidth="382.0">
               <columns>
@@ -118,6 +118,7 @@
               </columns>
 
             </TableView>
+            <Button fx:id="btn_about" mnemonicParsing="false" onAction="#about" text="Acerca de" />
          </children>
       </VBox>
       <VBox fx:id="vbox_addplayers" layoutX="459.0" layoutY="78.0" prefHeight="585.0" prefWidth="431.0">

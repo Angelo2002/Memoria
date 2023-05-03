@@ -10,9 +10,11 @@ import java.io.IOException;
 
 /**
  * JavaFX App
+ * Juego Memoria
+ * Autor: Angelo Marín
  */
 
-//TODO revisar loaders de fxml y escenas.
+
 public class App extends Application {
 
     private static Scene scene;
@@ -20,6 +22,8 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("Pre_GameStage"),1366, 700);
+        stage.setTitle("Memoria");
+        setRoot("Pre_GameStage");
         stage.setScene(scene);
         stage.show();
     }

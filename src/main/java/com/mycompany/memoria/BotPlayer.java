@@ -135,9 +135,11 @@ public class BotPlayer extends Player{
         }
         //si no hay cartas que coincidan con el algoritmo, escoge una carta aleatoria
         ArrayList<Card> chooseFrom = new ArrayList<>(otherCards);
+        //bots con precision >=0.5 escogen cartas aleatorias no vistas al iniciar
+        //esto permite que el bot tenga más oportunidades de hacer match
         if(accuracy>=0.5 && cardsChosenQuantity==0){
             chooseFrom.removeAll(seenCards);
-            chooseRandomCard(otherCards);
+            //chooseRandomCard(otherCards);
         }
         card = chooseRandomCard(chooseFrom);
         cardsChosen.add(card);

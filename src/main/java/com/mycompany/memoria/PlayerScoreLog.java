@@ -7,28 +7,19 @@ public class PlayerScoreLog {
     private SimpleStringProperty playerName;
     private SimpleFloatProperty totalScore;
 
-    //TODO implementar
-    private int totalGames;
-    private int totalWins;
-    private int totalLosses;
-    private int totalDraws;
+
+
 
     public PlayerScoreLog(String name){
         this.playerName = new SimpleStringProperty(name);
         this.totalScore = new SimpleFloatProperty(0);
-        this.totalGames = 0;
-        this.totalWins = 0;
-        this.totalLosses = 0;
-        this.totalDraws = 0;
+
     }
 
     public PlayerScoreLog(String name, float score){
         this.playerName = new SimpleStringProperty(name);
         this.totalScore = new SimpleFloatProperty(score);
-        this.totalGames = 0;
-        this.totalWins = 0;
-        this.totalLosses = 0;
-        this.totalDraws = 0;
+
     }
 
 
@@ -40,7 +31,7 @@ public class PlayerScoreLog {
     }
 
     public String toString(){
-        return this.playerName + "," + this.totalScore + "," + this.totalGames + "," + this.totalWins + "," + this.totalLosses + "," + this.totalDraws;
+        return this.playerName + "," + this.totalScore;
     }
 
     public String getPlayerName() {

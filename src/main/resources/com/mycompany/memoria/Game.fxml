@@ -9,13 +9,15 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.memoria.GameController">
    <children>
-      <StackPane fx:id="stackpane_table" layoutX="322.0" prefHeight="557.0" prefWidth="948.0" />
-      <VBox fx:id="vbox_gameinfo" layoutX="42.0" layoutY="14.0" prefHeight="433.0" prefWidth="218.0" />
+      <StackPane fx:id="stackpane_table" layoutX="336.0" layoutY="93.0" prefHeight="557.0" prefWidth="948.0" />
+      <VBox fx:id="vbox_gameinfo" layoutX="42.0" layoutY="14.0" prefHeight="238.0" prefWidth="218.0" />
       <HBox layoutX="42.0" layoutY="550.0" prefHeight="100.0" prefWidth="200.0">
          <children>
-            <Button fx:id="btn_ready" mnemonicParsing="false" onAction="#startGame" prefHeight="79.0" prefWidth="148.0" text="LISTO?" />
+            <Button fx:id="btn_startOrFinish" mnemonicParsing="false" onAction="#startGame" prefHeight="79.0" prefWidth="148.0" text="INICIAR" />
          </children>
       </HBox>
-      <Label fx:id="lbl_timer" layoutX="961.0" layoutY="626.0" prefHeight="49.0" prefWidth="118.0" text="no time" />
+      <Label fx:id="lbl_timer" layoutX="911.0" layoutY="14.0" prefHeight="49.0" prefWidth="218.0" text="no time" />
+      <Label fx:id="lbl_turnTime" layoutX="490.0" layoutY="-1.0" prefHeight="79.0" prefWidth="271.0" text="CAMBIO DE TURNO: ∞" />
+      <Button fx:id="btn_switchGodSight" disable="true" layoutX="42.0" layoutY="470.0" mnemonicParsing="false" onAction="#godSightAllCards" prefHeight="36.0" prefWidth="164.0" text="Ver Cartas" visible="false" />
    </children>
 </AnchorPane>

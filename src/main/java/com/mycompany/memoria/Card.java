@@ -9,9 +9,10 @@ public class Card {
 
     private boolean isFlipped;
     private boolean isMatched;
-    //TODO revisar si funciona en NetBeans
+
     static String MatchedPath = "\\src\\main\\java\\com\\mycompany\\images\\matched.png";
     static String HiddenPath = "\\src\\main\\java\\com\\mycompany\\images\\hidden.png";
+
     private boolean godSight = false;
     private ImageView matchedImage;
     private ImageView hiddenImage;
@@ -21,7 +22,7 @@ public class Card {
         this.cardID = cardID;
         this.isFlipped = false;
         this.isMatched = false;
-        //String absolutePath = new File("./").getAbsolutePath();
+
         setDefaultImages();
     }
 
@@ -121,5 +122,7 @@ public class Card {
     public boolean setGodSight(boolean godSight){
         return this.godSight = godSight;
     }
+
+
 
 }

@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Deck {
-    //deck class for memory game
-    //private final Card[][] matrixCards;
+
     private final ArrayList<cardSet> cardSets;
     private final ArrayList<Card> cards;
     private final int size;
@@ -80,7 +79,9 @@ public class Deck {
 
     public void unflipUnmatched() {
         for(Card card:cards){
-            if(!card.IsMatched() && card.IsFlipped()) card.flip();
+            if(!card.IsMatched() && card.IsFlipped()) {card.flip();
+            }
+
         }
     }
 
